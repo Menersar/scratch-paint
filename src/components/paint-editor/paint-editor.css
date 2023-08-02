@@ -9,6 +9,10 @@
     padding: calc(3 * $grid-unit);
 }
 
+[theme="dark"] .editor-container {
+    color-scheme: dark;
+}
+
 .row {
     display: flex;
     flex-direction: row;
@@ -106,6 +110,10 @@ $border-radius: 0.25rem;
     vertical-align: middle;
 }
 
+[theme="dark"] .button-group-button-icon {
+    filter: brightness(1.7);
+}
+
 .mod-mode-tools {
     margin-left: calc(2 * $grid-unit);
 }
@@ -131,11 +139,16 @@ $border-radius: 0.25rem;
     width: 100%;
     flex-grow: 1;
     min-width: 402px; /* Leave room for the border */
-    box-sizing: content-box;
+    /* !!! Effect and reason for remove of 'box-sizing: content-box'? ??? */
+    /* box-sizing: content-box; */
     border: 1px solid #e8edf1;
     border-radius: .25rem;
     position: relative;
     overflow: visible;
+}
+
+[theme="dark"] .canvas-container {
+    border-color: $form-border;
 }
 
 .mode-selector {
@@ -172,7 +185,9 @@ $border-radius: 0.25rem;
 .bitmap-button {
     display: flex;
     border-radius: 5px;
-    background-color: $looks-secondary;
+    /* !!! Maybe change again to the following line? ??? */
+    /* background-color: $looks-secondary; */
+    background-color: $motion-primary;
     padding: calc(2 * $grid-unit);
     line-height: 1.5rem;
     font-size: calc(3 * $grid-unit);
@@ -208,6 +223,8 @@ $border-radius: 0.25rem;
 .text-area {
     background: transparent;
     border: none;
+    /* !!! Maybe change colors values to variables? ??? */
+    color: black;
     display: none;
     margin: 0px;
     opacity: .8;

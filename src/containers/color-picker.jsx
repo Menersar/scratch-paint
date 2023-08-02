@@ -13,9 +13,24 @@ import GradientTypes from '../lib/gradient-types';
 import ColorPickerComponent from '../components/color-picker/color-picker.jsx';
 import {MIXED} from '../helper/style-path';
 import Modes from '../lib/modes';
+import {colorToHex, makeAlphaComponent} from '../lib/sidekick-color-utils';
 
 const colorStringToHsv = hexString => {
-    const hsv = parseColor(hexString).hsv;
+
+
+    // const hsv = parseColor(hexString).hsv;
+    let hsv;
+    if (hexString.startsWith('#') && hexString.length === 9) {
+        hsv = parseColor(hexString).hsva;
+        // The alpha values of hexadecimal colours are not parsed correctly via 'parseColor':
+        // So the alpha values of hexadecimal colours are parsed via the following lines.
+        const alpha = parseInt(hexString.substr(hexString.length - 2), 16) / 255;
+        hsv[3] = alpha;
+    } else {
+        hsv = parseColor(hexString).hsva;
+    }
+
+
     // Hue comes out in [0, 360], limit to [0, 100]
     hsv[0] = hsv[0] / 3.6;
     // Black is parsed as {0, 0, 0}, but turn saturation up to 100
@@ -26,10 +41,19 @@ const colorStringToHsv = hexString => {
     return hsv;
 };
 
-const hsvToHex = (h, s, v) =>
-    // Scale hue back up to [0, 360] from [0, 100]
-    parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex
-;
+
+// const hsvToHex = (h, s, v) =>
+//     // Scale hue back up to [0, 360] from [0, 100]
+//     parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex
+// ;
+const hsvToHex = (h, s, v, a) => {
+    let color = parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex;
+    if (a < 1) {
+        color += makeAlphaComponent(a);
+    }
+    return color;
+};
+
 
 // Important! This component ignores new color props except when isEyeDropping
 // This is to make the HSV <=> RGB conversion stable. The sliders manage their
@@ -39,10 +63,12 @@ class ColorPicker extends React.Component {
         super(props);
         bindAll(this, [
             'getHsv',
+            'handleAlphaChange',
             'handleChangeGradientTypeHorizontal',
             'handleChangeGradientTypeRadial',
             'handleChangeGradientTypeSolid',
             'handleChangeGradientTypeVertical',
+            'handleHexColorChange',
             'handleHueChange',
             'handleSaturationChange',
             'handleBrightnessChange',
@@ -55,7 +81,8 @@ class ColorPicker extends React.Component {
         this.state = {
             hue: hsv[0],
             saturation: hsv[1],
-            brightness: hsv[2]
+            brightness: hsv[2],
+            alpha: hsv[3]
         };
     }
     componentWillReceiveProps (newProps) {
@@ -67,7 +94,8 @@ class ColorPicker extends React.Component {
             this.setState({
                 hue: hsv[0],
                 saturation: hsv[1],
-                brightness: hsv[2]
+                brightness: hsv[2],
+                alpha: hsv[3]
             });
         }
     }
@@ -75,30 +103,81 @@ class ColorPicker extends React.Component {
         const isTransparent = color === null;
         const isMixed = color === MIXED;
         return isTransparent || isMixed ?
-            [50, 100, 100] : colorStringToHsv(color);
+
+
+            // [50, 100, 100] : colorStringToHsv(color);
+            // !!! 'isTransparent' just '0' or '1'? ???
+            [50, 100, 100, isTransparent ? 0 : 1] : colorStringToHsv(color);
     }
+    ensureNonZeroAlpha () {
+        if (this.state.alpha === 0) {
+            this.setState({
+                alpha: 1
+            });
+        }
+    }
+
+
     handleHueChange (hue) {
+        this.ensureNonZeroAlpha();
         this.setState({hue: hue}, () => {
             this.handleColorChange();
         });
     }
     handleSaturationChange (saturation) {
+        this.ensureNonZeroAlpha();
         this.setState({saturation: saturation}, () => {
             this.handleColorChange();
         });
     }
     handleBrightnessChange (brightness) {
+        this.ensureNonZeroAlpha();
         this.setState({brightness: brightness}, () => {
             this.handleColorChange();
         });
     }
+    // !!! Add 'this.ensureNonZeroAlpha();' in 'handleColorChange () {' as well? ???
     handleColorChange () {
         this.props.onChangeColor(hsvToHex(
             this.state.hue,
             this.state.saturation,
-            this.state.brightness
+            this.state.brightness,
+            this.state.alpha
         ));
     }
+
+
+    handleAlphaChange (alpha) {
+        this.setState({alpha: alpha / 100}, () => {
+            if (this.state.alpha === 0) {
+                this.handleTransparent();
+            } else {
+                this.handleColorChange();
+            }
+        });
+    }
+    handleHexColorChange (e) {
+        let color;
+        if (typeof e === 'string') {
+            color = e;
+        } else {
+            color = e.target.value;
+        }
+        color = colorToHex(color);
+        if (!color) {
+            return;
+        }
+        const hsv = colorStringToHsv(color);
+        this.setState({
+            hue: hsv[0],
+            saturation: hsv[1],
+            brightness: hsv[2],
+            alpha: hsv[3]
+        });
+        this.props.onChangeColor(color);
+    }
+
+
     handleTransparent () {
         this.props.onChangeColor(null);
     }
@@ -123,11 +202,13 @@ class ColorPicker extends React.Component {
     render () {
         return (
             <ColorPickerComponent
+                alpha={this.state.alpha * 100}
                 brightness={this.state.brightness}
                 color={this.props.color}
                 color2={this.props.color2}
                 colorIndex={this.props.colorIndex}
                 gradientType={this.props.gradientType}
+                hexColor={colorToHex(this.props.colorIndex === 0 ? this.props.color : this.props.color2)}
                 hue={this.state.hue}
                 isEyeDropping={this.props.isEyeDropping}
                 mode={this.props.mode}
@@ -135,11 +216,13 @@ class ColorPicker extends React.Component {
                 saturation={this.state.saturation}
                 shouldShowGradientTools={this.props.shouldShowGradientTools}
                 onActivateEyeDropper={this.handleActivateEyeDropper}
+                onAlphaChange={this.handleAlphaChange}
                 onBrightnessChange={this.handleBrightnessChange}
                 onChangeGradientTypeHorizontal={this.handleChangeGradientTypeHorizontal}
                 onChangeGradientTypeRadial={this.handleChangeGradientTypeRadial}
                 onChangeGradientTypeSolid={this.handleChangeGradientTypeSolid}
                 onChangeGradientTypeVertical={this.handleChangeGradientTypeVertical}
+                onHexColorChange={this.handleHexColorChange}
                 onHueChange={this.handleHueChange}
                 onSaturationChange={this.handleSaturationChange}
                 onSelectColor={this.props.onSelectColor}

@@ -1,0 +1,23 @@
+/* !!!! */
+
+/* !!! CHANGE MAYBE? ??? */
+.readout {
+    width: 28px;
+    height: 16px;
+    text-align: center;
+    /* ??? '-moz-appearance' is not supported by Chrome, Chrome Android, Edge, Internet Explorer, Opera, Safari, Safari on iOS, Samsung Internet. Add 'appearance' to support Chrome 84+, Chrome Android 84+, Edge 84+, Opera 70+, Safari 15.4+, Safari on iOS 15.4+, Samsung Internet 14.0+. Add '-webkit-appearance' to support Safari 3+, Safari on iOS. Microsoft Edge Tools (compat-api/css) !!! */
+    -moz-appearance: textfield;
+    font: inherit;
+    font-weight: bold;
+  }
+  [dir="ltr"] .readout {
+    margin-left: 10px;
+  }
+  [dir="rtl"] .readout {
+    margin-right: 10px;
+  }
+  .readout::-webkit-outer-spin-button,
+  .readout::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }

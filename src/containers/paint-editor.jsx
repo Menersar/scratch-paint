@@ -17,15 +17,23 @@ import {deactivateEyeDropper} from '../reducers/eye-dropper';
 import {setTextEditTarget} from '../reducers/text-edit-target';
 import {updateViewBounds} from '../reducers/view-bounds';
 import {setLayout} from '../reducers/layout';
+import {setTheme as setReduxTheme} from '../reducers/theme';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
-import {resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
+// import {resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
+import {resizeView, resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
 import EyeDropperTool from '../helper/tools/eye-dropper';
 
 import Modes, {BitmapModes, VectorModes} from '../lib/modes';
 import Formats, {isBitmap, isVector} from '../lib/format';
 import bindAll from 'lodash.bindall';
+
+
+// !!!!
+// !!! ???
+window.paper = paper;
+
 
 /**
  * The top-level paint editor component. See README for more details on usage.
@@ -82,6 +90,7 @@ class PaintEditor extends React.Component {
             'setTextArea',
             'startEyeDroppingLoop',
             'stopEyeDroppingLoop',
+            'handleChangeTheme',
             'handleSetSelectedItems',
             'handleZoomIn',
             'handleZoomOut',
@@ -92,6 +101,11 @@ class PaintEditor extends React.Component {
             colorInfo: null
         };
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
+
+
+        resizeView(this.props.width, this.props.height);
+
+
     }
     componentDidMount () {
         document.addEventListener('keydown', this.props.onKeyPress);
@@ -112,6 +126,13 @@ class PaintEditor extends React.Component {
         if (newProps.rtl !== this.props.rtl) {
             this.props.setLayout(newProps.rtl ? 'rtl' : 'ltr');
         }
+
+
+        if (this.props.theme !== newProps.theme) {
+            this.props.setReduxTheme('default');
+        }
+
+
     }
     componentDidUpdate (prevProps) {
         if (this.props.isEyeDropping && !prevProps.isEyeDropping) {
@@ -208,6 +229,17 @@ class PaintEditor extends React.Component {
             }
         }
     }
+
+
+    getEffectiveTheme () {
+        return this.props.reduxTheme === 'default' ? this.props.theme : this.props.reduxTheme;
+    }
+    handleChangeTheme () {
+        const newTheme = this.getEffectiveTheme() === 'light' ? 'dark' : 'light';
+        this.props.setReduxTheme(newTheme === this.props.theme ? 'default' : newTheme);
+    }
+
+
     handleZoomIn () {
         // Make the "next step" after the outermost zoom level be the default
         // zoom level (0.5)
@@ -281,7 +313,12 @@ class PaintEditor extends React.Component {
         this.eyeDropper.pickY = -1;
         this.eyeDropper.activate();
 
-        this.intervalId = setInterval(() => {
+
+        // this.intervalId = setInterval(() => {
+        const callback = () => {
+            this.animationFrameId = requestAnimationFrame(callback);
+
+
             const colorInfo = this.eyeDropper.getColorInfo(
                 this.eyeDropper.pickX,
                 this.eyeDropper.pickY,
@@ -297,10 +334,21 @@ class PaintEditor extends React.Component {
                     colorInfo: colorInfo
                 });
             }
-        }, 30);
+
+
+        // }, 30);
+        };
+        this.animationFrameId = requestAnimationFrame(callback);
+
+
     }
     stopEyeDroppingLoop () {
-        clearInterval(this.intervalId);
+
+
+        // clearInterval(this.intervalId);
+        cancelAnimationFrame(this.animationFrameId);
+
+
         this.setState({colorInfo: null});
     }
     render () {
@@ -322,7 +370,9 @@ class PaintEditor extends React.Component {
                 setCanvas={this.setCanvas}
                 setTextArea={this.setTextArea}
                 textArea={this.state.textArea}
+                theme={this.getEffectiveTheme()}
                 zoomLevelId={this.props.zoomLevelId}
+                onChangeTheme={this.handleChangeTheme}
                 onRedo={this.props.onRedo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}
                 onSwitchToVector={this.props.handleSwitchToVector}
@@ -332,6 +382,7 @@ class PaintEditor extends React.Component {
                 onZoomIn={this.handleZoomIn}
                 onZoomOut={this.handleZoomOut}
                 onZoomReset={this.handleZoomReset}
+                width={this.props.width}
             />
         );
     }
@@ -345,6 +396,7 @@ PaintEditor.propTypes = {
     fontInlineFn: PropTypes.func,
     handleSwitchToBitmap: PropTypes.func.isRequired,
     handleSwitchToVector: PropTypes.func.isRequired,
+    height: PropTypes.number,
     image: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.instanceOf(HTMLImageElement)
@@ -364,18 +416,36 @@ PaintEditor.propTypes = {
         activate: PropTypes.func.isRequired,
         remove: PropTypes.func.isRequired
     }),
+
+
+    // !!!!
+    // !!! 'reduxTheme'? ???
+    reduxTheme: PropTypes.oneOf(['default', 'light', 'dark']),
+
+
     removeTextEditTarget: PropTypes.func.isRequired,
     rotationCenterX: PropTypes.number,
     rotationCenterY: PropTypes.number,
     rtl: PropTypes.bool,
     setLayout: PropTypes.func.isRequired,
+    setReduxTheme: PropTypes.func.isRequired,
     setSelectedItems: PropTypes.func.isRequired,
     shouldShowRedo: PropTypes.func.isRequired,
     shouldShowUndo: PropTypes.func.isRequired,
+    theme: PropTypes.oneOf(['light', 'dark']),
     updateViewBounds: PropTypes.func.isRequired,
     viewBounds: PropTypes.instanceOf(paper.Matrix).isRequired,
+    width: PropTypes.number,
     zoomLevelId: PropTypes.string
 };
+
+
+PaintEditor.defaultProps = {
+    width: 480,
+    height: 360,
+    theme: 'light'
+};
+
 
 const mapStateToProps = state => ({
     changeColorToEyeDropper: state.scratchPaint.color.eyeDropper.callback,
@@ -383,6 +453,7 @@ const mapStateToProps = state => ({
     isEyeDropping: state.scratchPaint.color.eyeDropper.active,
     mode: state.scratchPaint.mode,
     previousTool: state.scratchPaint.color.eyeDropper.previousTool,
+    reduxTheme: state.scratchPaint.theme,
     viewBounds: state.scratchPaint.viewBounds
 });
 const mapDispatchToProps = dispatch => ({
@@ -403,6 +474,9 @@ const mapDispatchToProps = dispatch => ({
     },
     setLayout: layout => {
         dispatch(setLayout(layout));
+    },
+    setReduxTheme: theme => {
+        dispatch(setReduxTheme(theme));
     },
     setSelectedItems: format => {
         dispatch(setSelectedItems(getSelectedLeafItems(), isBitmap(format)));

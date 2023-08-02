@@ -1,3 +1,5 @@
+// ??? Exact definition of 'Reducer' here / in the application's context? ???
+
 import {combineReducers} from 'redux';
 import modeReducer from './modes';
 import bitBrushSizeReducer from './bit-brush-size';
@@ -16,6 +18,7 @@ import layoutReducer from './layout';
 import modalsReducer from './modals';
 import selectedItemReducer from './selected-items';
 import textEditTargetReducer from './text-edit-target';
+import themeReducer from './theme';
 import viewBoundsReducer from './view-bounds';
 import undoReducer from './undo';
 import zoomLevelsReducer from './zoom-levels';
@@ -38,6 +41,8 @@ export default combineReducers({
     modals: modalsReducer,
     selectedItems: selectedItemReducer,
     textEditTarget: textEditTargetReducer,
+    // !!! ???
+    theme: themeReducer,
     undo: undoReducer,
     viewBounds: viewBoundsReducer,
     zoomLevels: zoomLevelsReducer

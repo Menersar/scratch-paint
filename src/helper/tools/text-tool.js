@@ -6,6 +6,18 @@ import NudgeTool from '../selection-tools/nudge-tool';
 import {hoverBounds} from '../guides';
 import {getRaster} from '../layer';
 
+
+// !!!!
+const getTextColor = text => {
+    let color = text.fillColor;
+    if (!color) return null;
+    color = color.clone();
+    color.alpha = 1;
+    if (color.type !== 'gradient') return color;
+    const firstStop = text.fillColor.gradient.stops[0];
+    return firstStop.color;
+};
+
 /**
  * Tool for adding text. Text elements have limited editability; they can't be reshaped,
  * drawn on or erased. This way they can preserve their ability to have the text edited.
@@ -241,6 +253,7 @@ class TextTool extends paper.Tool {
                 content: '',
                 font: this.font,
                 fontSize: 40,
+                // ??? 'TODO' !!!
                 // TODO: style using gradient
                 // https://github.com/LLK/scratch-paint/issues/1164
                 fillColor: this.colorState.fillColor.primary,
@@ -344,6 +357,9 @@ class TextTool extends paper.Tool {
         }
         this.element.style.fontSize = `${this.textBox.fontSize}px`;
         this.element.style.lineHeight = this.textBox.leading / this.textBox.fontSize;
+
+        const fillColor = getTextColor(textBox);
+        this.element.style.color = fillColor ? fillColor.toCSS() : '';
 
         this.element.style.display = 'initial';
         this.element.value = textBox.content ? textBox.content : '';

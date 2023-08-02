@@ -39,9 +39,26 @@ Edited to add input-range-small
     min-width: 0;
 }
 
+[theme="dark"] .input-form {
+    background: rgb(39, 39, 39);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
 .input-form:focus {
-    border-color: $looks-secondary;
-    box-shadow: 0 0 0 $grid-unit $looks-transparent;
+    /* !!! Maybe change again to the following two lines? ??? */
+    /* border-color: $looks-secondary; */
+    /* box-shadow: 0 0 0 $grid-unit $looks-transparent; */
+
+    border-color: $motion-primary;
+    box-shadow: 0 0 0 $grid-unit $motion-transparent;
+}
+
+[theme="dark"] .input-form:hover {
+    border-color: #2d2d2d;
+}
+
+[theme="dark"] .input-form:focus {
+    border-color: #2d2d2d;
 }
 
 .input-small {

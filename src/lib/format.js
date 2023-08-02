@@ -3,6 +3,7 @@ import keyMirror from 'keymirror';
 const Formats = keyMirror({
     BITMAP: null,
     VECTOR: null,
+    // ??? 'VECTOR_SKIP_CONVERT', 'BITMAP_SKIP_CONVERT'? !!!
     // Format changes which should not trigger conversions, for instance undo
     BITMAP_SKIP_CONVERT: null,
     VECTOR_SKIP_CONVERT: null

@@ -5,7 +5,11 @@ import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-int
 import classNames from 'classnames';
 import parseColor from 'parse-color';
 
+import SidekickColorReadout from '../sidekick-color-readout/sidekick-color-readout.jsx';
+
 import Slider, {CONTAINER_WIDTH, HANDLE_WIDTH} from '../forms/slider.jsx';
+import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
+import Input from '../forms/input.jsx';
 import LabeledIconButton from '../labeled-icon-button/labeled-icon-button.jsx';
 import styles from './color-picker.css';
 import GradientTypes from '../../lib/gradient-types';
@@ -20,6 +24,10 @@ import fillSolidIcon from './icons/fill-solid-enabled.svg';
 import fillVertGradientIcon from './icons/fill-vert-gradient-enabled.svg';
 import swapIcon from './icons/swap.svg';
 import Modes from '../../lib/modes';
+import alphaBackground from './alpha.png';
+import {makeAlphaComponent} from '../../lib/sidekick-color-utils';
+
+const BufferedInput = BufferedInputHOC(Input);
 
 const hsvToHex = (h, s, v) =>
     // Scale hue back up to [0, 360] from [0, 100]
@@ -49,6 +57,11 @@ class ColorPickerComponent extends React.Component {
             case 'brightness':
                 stops.push(hsvToHex(this.props.hue, this.props.saturation, n));
                 break;
+            case 'alpha': {
+                const alpha = makeAlphaComponent(n / 100);
+                stops.push(`${hsvToHex(this.props.hue, this.props.saturation, this.props.brightness)}${alpha}`);
+                break;
+            }
             default:
                 throw new Error(`Unknown channel for color sliders: ${channel}`);
             }
@@ -63,7 +76,12 @@ class ColorPickerComponent extends React.Component {
         stops[0] += ` 0 ${halfHandleWidth}px`;
         stops[stops.length - 1] += ` ${CONTAINER_WIDTH - halfHandleWidth}px 100%`;
 
-        return `linear-gradient(to left, ${stops.join(',')})`;
+        // return `linear-gradient(to left, ${stops.join(',')})`;
+        let css = `linear-gradient(to left, ${stops.join(',')})`;
+        if (channel === 'alpha') {
+            css = `${css}, url("${alphaBackground}")`;
+        }
+        return css;
     }
     render () {
         return (
@@ -83,6 +101,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillSolidIcon}
                                     onClick={this.props.onChangeGradientTypeSolid}
+                                    width={20}
+                                    height={20}
                                 />
                                 <img
                                     className={classNames({
@@ -93,6 +113,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillHorzGradientIcon}
                                     onClick={this.props.onChangeGradientTypeHorizontal}
+                                    width={20}
+                                    height={20}
                                 />
                                 <img
                                     className={classNames({
@@ -102,6 +124,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillVertGradientIcon}
                                     onClick={this.props.onChangeGradientTypeVertical}
+                                    width={20}
+                                    height={20}
                                 />
                                 <img
                                     className={classNames({
@@ -111,6 +135,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillRadialIcon}
                                     onClick={this.props.onChangeGradientTypeRadial}
+                                    width={20}
+                                    height={20}
                                 />
                             </div>
                         </div>
@@ -197,9 +223,13 @@ class ColorPickerComponent extends React.Component {
                                 id="paint.paintEditor.hue"
                             />
                         </span>
-                        <span className={styles.labelReadout}>
+                        {/* <span className={styles.labelReadout}>
                             {Math.round(this.props.hue)}
-                        </span>
+                        </span> */}
+                        <SidekickColorReadout
+                            value={this.props.hue}
+                            onChange={this.props.onHueChange}
+                        />
                     </div>
                     <div className={styles.rowSlider}>
                         <Slider
@@ -218,9 +248,13 @@ class ColorPickerComponent extends React.Component {
                                 id="paint.paintEditor.saturation"
                             />
                         </span>
-                        <span className={styles.labelReadout}>
+                        {/* <span className={styles.labelReadout}>
                             {Math.round(this.props.saturation)}
-                        </span>
+                        </span> */}
+                        <SidekickColorReadout
+                            value={this.props.saturation}
+                            onChange={this.props.onSaturationChange}
+                        />
                     </div>
                     <div className={styles.rowSlider}>
                         <Slider
@@ -239,19 +273,68 @@ class ColorPickerComponent extends React.Component {
                                 id="paint.paintEditor.brightness"
                             />
                         </span>
-                        <span className={styles.labelReadout}>
+                        {/* <span className={styles.labelReadout}>
                             {Math.round(this.props.brightness)}
-                        </span>
+                        </span> */}
+                        <SidekickColorReadout
+                            value={this.props.brightness}
+                            onChange={this.props.onBrightnessChange}
+                        />
                     </div>
                     <div className={styles.rowSlider}>
                         <Slider
-                            lastSlider
+                            // !!! 'lastSlider' use case; and reason to remove 'lastSlider' here? ???
+                            // lastSlider
                             background={this._makeBackground('brightness')}
                             value={this.props.brightness}
                             onChange={this.props.onBrightnessChange}
                         />
                     </div>
                 </div>
+
+
+
+                <div className={styles.row}>
+                    <div className={styles.rowHeader}>
+                        <span className={styles.labelName}>
+                            <FormattedMessage
+                                defaultMessage="Opacity"
+                                description="Label for the transparency component in the color picker"
+                                id="gui.paint.alpha"
+                            />
+                        </span>
+                        <SidekickColorReadout
+                            value={this.props.alpha}
+                            onChange={this.props.onAlphaChange}
+                        />
+                    </div>
+                    <div className={styles.rowSlider}>
+                        <Slider
+                            lastSlider
+                            background={this._makeBackground('alpha')}
+                            value={this.props.alpha}
+                            onChange={this.props.onAlphaChange}
+                        />
+                    </div>
+                </div>
+                <div className={styles.pickerRow}>
+                    <Input
+                        type="color"
+                        className={styles.pickerColor}
+                        // The HTML <Input/> tag of type 'color' does not supports transparency.
+                        value={this.props.hexColor ? this.props.hexColor.substr(0, 7) : '#000000'}
+                        onChange={this.props.onHexColorChange}
+                    />
+                    <BufferedInput
+                        type="text"
+                        className={styles.pickerText}
+                        value={this.props.hexColor || '#00000000'}
+                        onSubmit={this.props.onHexColorChange}
+                        placeholder="#123abc"
+                    />
+                </div>
+
+
                 <div className={styles.swatchRow}>
                     <div className={styles.swatches}>
                         {this.props.mode === Modes.BIT_LINE ||
@@ -299,21 +382,25 @@ class ColorPickerComponent extends React.Component {
 }
 
 ColorPickerComponent.propTypes = {
+    alpha: PropTypes.number.isRequired,
     brightness: PropTypes.number.isRequired,
     color: PropTypes.string,
     color2: PropTypes.string,
     colorIndex: PropTypes.number.isRequired,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    hexColor: PropTypes.string,
     hue: PropTypes.number.isRequired,
     intl: intlShape.isRequired,
     isEyeDropping: PropTypes.bool.isRequired,
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onActivateEyeDropper: PropTypes.func.isRequired,
+    onAlphaChange: PropTypes.func.isRequired,
     onBrightnessChange: PropTypes.func.isRequired,
     onChangeGradientTypeHorizontal: PropTypes.func.isRequired,
     onChangeGradientTypeRadial: PropTypes.func.isRequired,
     onChangeGradientTypeSolid: PropTypes.func.isRequired,
     onChangeGradientTypeVertical: PropTypes.func.isRequired,
+    onHexColorChange: PropTypes.func,
     onHueChange: PropTypes.func.isRequired,
     onSaturationChange: PropTypes.func.isRequired,
     onSelectColor: PropTypes.func.isRequired,

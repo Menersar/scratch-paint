@@ -37,7 +37,7 @@ const createCanvas = function (width, height) {
 const clearRaster = function () {
     const layer = _getLayer('isRasterLayer');
     layer.removeChildren();
-    
+
     // Generate blank raster
     const raster = new paper.Raster(createCanvas());
     raster.canvas.getContext('2d').imageSmoothingEnabled = false;
@@ -63,6 +63,12 @@ const getDragCrosshairLayer = function () {
 const getBackgroundGuideLayer = function () {
     return _getLayer('isBackgroundGuideLayer');
 };
+
+
+const getOutlineLayer = function () {
+    return _getLayer('isOutlineLayer');
+};
+
 
 const _convertLayer = function (layer, format) {
     layer.bitmapBackground.visible = isBitmap(format);
@@ -176,7 +182,18 @@ const _makeRasterLayer = function () {
     return rasterLayer;
 };
 
-const _makeBackgroundPaper = function (width, height, color, opacity) {
+
+// const _makeBackgroundPaper = function (width, height, color, opacity) {
+// !!! CHANGE COLOUR ???
+// !!! Maybe change colors values to variables? ???
+const BACKGROUND_LIGHT = '#FFFFFF';
+const BACKGROUND_TILE_LIGHT = '#D9E3F2';
+const BACKGROUND_DARK = '#111';
+const BACKGROUND_TILE_DARK = '#222';
+
+const _makeBackgroundPaper = function (width, height, opacity) {
+
+
     // creates a checkerboard path of width * height squares in color on white
     let x = 0;
     let y = 0;
@@ -198,13 +215,23 @@ const _makeBackgroundPaper = function (width, height, color, opacity) {
     const vRect = new paper.Shape.Rectangle(
         new paper.Point(0, 0),
         new paper.Point(ART_BOARD_WIDTH / CHECKERBOARD_SIZE, ART_BOARD_HEIGHT / CHECKERBOARD_SIZE));
-    vRect.fillColor = '#fff';
+
+
+    // vRect.fillColor = '#fff';
+    vRect.fillColor = BACKGROUND_LIGHT;
+
     vRect.guide = true;
     vRect.locked = true;
     vRect.position = CENTER;
     const vPath = new paper.Path(pathPoints);
     vPath.fillRule = 'evenodd';
-    vPath.fillColor = color;
+
+
+    // // ??? 'color'? !!!
+    // vPath.fillColor = color;
+    vPath.fillColor = BACKGROUND_TILE_LIGHT;
+
+
     vPath.opacity = opacity;
     vPath.guide = true;
     vPath.locked = true;
@@ -219,38 +246,75 @@ const _makeBackgroundPaper = function (width, height, color, opacity) {
     return vGroup;
 };
 
+
+// !!! CHANGE COLOUR ???
+// !!! Maybe change colors values to variables? ???
+const CROSSHAIR_INNER_LIGHT = '#000000';
+const CROSSHAIR_OUTER_LIGHT = '#FFFFFF';
+
+
 // Helper function for drawing a crosshair
 const _makeCrosshair = function (opacity, parent) {
     const crosshair = new paper.Group();
 
     const vLine2 = new paper.Path.Line(new paper.Point(0, -7), new paper.Point(0, 7));
     vLine2.strokeWidth = 6;
-    vLine2.strokeColor = 'white';
+
+
+    // vLine2.strokeColor = 'white';
+    vLine2.strokeColor = CROSSHAIR_OUTER_LIGHT;
+
+
     vLine2.strokeCap = 'round';
     crosshair.addChild(vLine2);
     const hLine2 = new paper.Path.Line(new paper.Point(-7, 0), new paper.Point(7, 0));
     hLine2.strokeWidth = 6;
-    hLine2.strokeColor = 'white';
+
+
+    // hLine2.strokeColor = 'white';
+    hLine2.strokeColor = CROSSHAIR_OUTER_LIGHT;
+
+
     hLine2.strokeCap = 'round';
     crosshair.addChild(hLine2);
     const circle2 = new paper.Shape.Circle(new paper.Point(0, 0), 5.5);
     circle2.strokeWidth = 6;
-    circle2.strokeColor = 'white';
+
+
+    // circle2.strokeColor = 'white';
+    circle2.strokeColor = CROSSHAIR_OUTER_LIGHT;
+
+
     crosshair.addChild(circle2);
 
     const vLine = new paper.Path.Line(new paper.Point(0, -7), new paper.Point(0, 7));
     vLine.strokeWidth = 2;
-    vLine.strokeColor = 'black';
+
+
+    // vLine.strokeColor = 'black';
+    vLine.strokeColor = CROSSHAIR_INNER_LIGHT;
+
+
     vLine.strokeCap = 'round';
     crosshair.addChild(vLine);
     const hLine = new paper.Path.Line(new paper.Point(-7, 0), new paper.Point(7, 0));
     hLine.strokeWidth = 2;
-    hLine.strokeColor = 'black';
+
+
+    // hLine.strokeColor = 'black';
+    hLine.strokeColor = CROSSHAIR_INNER_LIGHT;
+
+
     hLine.strokeCap = 'round';
     crosshair.addChild(hLine);
     const circle = new paper.Shape.Circle(new paper.Point(0, 0), 5.5);
     circle.strokeWidth = 2;
-    circle.strokeColor = 'black';
+
+
+    // circle.strokeColor = 'black';
+    circle.strokeColor = CROSSHAIR_INNER_LIGHT;
+
+
     crosshair.addChild(circle);
 
     setGuideItem(crosshair);
@@ -270,27 +334,55 @@ const _makeDragCrosshairLayer = function () {
     return dragCrosshairLayer;
 };
 
+
+// !!! CHANGE COLOUR ???
+// !!! Maybe change colors values to variables? ???
+const OUTLINE_INNER_LIGHT = '#FFFFFF';
+const OUTLINE_OUTER_LIGHT = '#4280D7';
+const OUTLINE_INNER_DARK = '#555555';
+
+
 const _makeOutlineLayer = function () {
     const outlineLayer = new paper.Layer();
     const whiteRect = new paper.Shape.Rectangle(ART_BOARD_BOUNDS.expand(1));
     whiteRect.strokeWidth = 2;
-    whiteRect.strokeColor = 'white';
+
+
+    // whiteRect.strokeColor = 'white';
+    whiteRect.strokeColor = OUTLINE_INNER_LIGHT;
+
     setGuideItem(whiteRect);
     const blueRect = new paper.Shape.Rectangle(ART_BOARD_BOUNDS.expand(5));
     blueRect.strokeWidth = 2;
-    blueRect.strokeColor = '#4280D7';
+
+
+    // blueRect.strokeColor = '#4280D7';
+    blueRect.strokeColor = OUTLINE_OUTER_LIGHT;
+
     blueRect.opacity = 0.25;
     setGuideItem(blueRect);
     outlineLayer.data.isOutlineLayer = true;
     return outlineLayer;
 };
 
+
+// !!! CHANGE COLOUR ???
+// !!! Maybe change colors values to variables? ???
+const WORKSPACE_BOUNDS_LIGHT = '#ECF1F9';
+const WORKSPACE_BOUNDS_DARK = '#333';
+
+
 const _makeBackgroundGuideLayer = function (format) {
     const guideLayer = new paper.Layer();
     guideLayer.locked = true;
-    
+
     const vWorkspaceBounds = new paper.Shape.Rectangle(MAX_WORKSPACE_BOUNDS);
-    vWorkspaceBounds.fillColor = '#ECF1F9';
+
+
+    // vWorkspaceBounds.fillColor = '#ECF1F9';
+    vWorkspaceBounds.fillColor = WORKSPACE_BOUNDS_LIGHT;
+
+
     vWorkspaceBounds.position = CENTER;
 
     // Add 1 to the height because it's an odd number otherwise, and we want it to be even
@@ -298,7 +390,12 @@ const _makeBackgroundGuideLayer = function (format) {
     const vBackground = _makeBackgroundPaper(
         MAX_WORKSPACE_BOUNDS.width / CHECKERBOARD_SIZE,
         (MAX_WORKSPACE_BOUNDS.height / CHECKERBOARD_SIZE) + 1,
-        '#D9E3F2', 0.55);
+
+
+        // '#D9E3F2', 0.55);
+        0.55);
+
+
     vBackground.position = CENTER;
     vBackground.scaling = new paper.Point(CHECKERBOARD_SIZE, CHECKERBOARD_SIZE);
 
@@ -311,7 +408,11 @@ const _makeBackgroundGuideLayer = function (format) {
     const bitmapBackground = _makeBackgroundPaper(
         ART_BOARD_WIDTH / CHECKERBOARD_SIZE,
         ART_BOARD_HEIGHT / CHECKERBOARD_SIZE,
-        '#D9E3F2', 0.55);
+
+
+        // '#D9E3F2', 0.55);
+        0.55);
+
     bitmapBackground.position = CENTER;
     bitmapBackground.scaling = new paper.Point(CHECKERBOARD_SIZE, CHECKERBOARD_SIZE);
     bitmapBackground.guide = true;
@@ -319,12 +420,31 @@ const _makeBackgroundGuideLayer = function (format) {
     guideLayer.bitmapBackground = bitmapBackground;
 
     _convertLayer(guideLayer, format);
-    
+
     _makeCrosshair(0.16, guideLayer);
 
     guideLayer.data.isBackgroundGuideLayer = true;
     return guideLayer;
 };
+
+
+const updateTheme = function (theme) {
+    const isDark = theme === 'dark';
+
+    const backgroundGuideLayer = getBackgroundGuideLayer();
+    const bitmapChildren = backgroundGuideLayer.bitmapBackground.children;
+    bitmapChildren[0].fillColor = isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT;
+    bitmapChildren[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
+
+    const vectorChildren = backgroundGuideLayer.vectorBackground.children;
+    vectorChildren[0].fillColor = isDark ? WORKSPACE_BOUNDS_DARK : WORKSPACE_BOUNDS_LIGHT;
+    vectorChildren[1].children[0].fillColor = isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT;
+    vectorChildren[1].children[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
+
+    const outlineLayer = getOutlineLayer();
+    outlineLayer.children[0].strokeColor = isDark ? OUTLINE_INNER_DARK : OUTLINE_INNER_LIGHT;
+};
+
 
 const setupLayers = function (format) {
     const backgroundGuideLayer = _makeBackgroundGuideLayer(format);
@@ -353,5 +473,6 @@ export {
     clearRaster,
     getRaster,
     setGuideItem,
+    updateTheme,
     setupLayers
 };

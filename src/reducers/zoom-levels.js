@@ -1,13 +1,18 @@
 import paper from '@scratch/paper';
 import log from '../log/log';
 
+const RESET_ZOOM_LEVELS = 'scratch-paint/zoom-levels/RESET_ZOOM_LEVELS';
 const SAVE_ZOOM_LEVEL = 'scratch-paint/zoom-levels/SAVE_ZOOM_LEVEL';
 const SET_ZOOM_LEVEL_ID = 'scratch-paint/zoom-levels/SET_ZOOM_LEVEL_ID';
+
+// ??? !!!
 const initialState = {};
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {
+    case RESET_ZOOM_LEVELS:
+        return {};
     case SET_ZOOM_LEVEL_ID:
         if (action.zoomLevelId === 'currentZoomLevelId') {
             log.warn(`currentZoomLevelId is an invalid string for zoomLevel`);
@@ -23,6 +28,12 @@ const reducer = function (state, action) {
     default:
         return state;
     }
+};
+
+const resetZoomLevels = function () {
+    return {
+        type: RESET_ZOOM_LEVELS
+    };
 };
 
 // Action creators ==================================
@@ -44,6 +55,7 @@ const setZoomLevelId = function (zoomLevelId) {
 
 export {
     reducer as default,
+    resetZoomLevels,
     saveZoomLevel,
     setZoomLevelId
 };

@@ -13,6 +13,11 @@
     height: 2rem;
 }
 
+/* !!! CHANGE MAYBE LATER ??? */
+[theme="dark"] .mode-tools-icon {
+    filter: brightness(1.7);
+}
+
 [dir="ltr"] .mod-dashed-border {
     border-right: 1px dashed $ui-pane-border;
     padding-right: calc(3 * $grid-unit);

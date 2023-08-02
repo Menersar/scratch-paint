@@ -2,6 +2,12 @@
 @import "../../css/units";
 
 /* Popover styles */
+/* 'body': To override some add-ons that set a lower z-index. */
+body :global(.Popover) {
+    /* On top of the menu bar. */
+    z-index: 500;
+}
+
 :global(.Popover-body) {
     background: white;
     border: 1px solid #ddd;
@@ -22,6 +28,7 @@
 
 .swatch-row {
     display: flex;
+    /* ??? 'flex-direction' is not supported by Internet Explorer < 11. Add '-ms-flex-direction' to support Internet Explorer 10+. !!! */
     flex-direction: row;
     justify-content: space-between;
 }
@@ -30,16 +37,21 @@
     font-family: "Helvetica Neue", Helvetica, sans-serif;
     font-size: 0.65rem;
     color: #575E75;
-    margin: 8px;
+    /* margin: 8px; */
+    margin: 8px 8px 0 8px;
 }
 
-[dir="ltr"] .label-readout {
+[theme="dark"] .row-header {
+    color: #e1e1e1;
+}
+
+/* [dir="ltr"] .label-readout {
     margin-left: 10px;
 }
 
 [dir="rtl"] .label-readout {
     margin-right: 10px;
-}
+} */
 
 .label-name {
     font-weight: bold;
@@ -48,6 +60,10 @@
 .divider {
     border-top: 1px solid #ddd;
     margin: 8px;
+}
+
+[theme="dark"] .divider {
+    border-color: #2d2d2d;
 }
 
 .swap-button {
@@ -69,6 +85,10 @@
     align-items: center;
 }
 
+[theme="dark"] .swatch {
+    border-color: $form-border;
+}
+
 .large-swatch-icon {
     width: 1.75rem;
     margin: auto;
@@ -80,8 +100,12 @@
 }
 
 .active-swatch {
-    border: 1px solid $looks-secondary;
-    box-shadow: 0px 0px 0px 3px $looks-transparent;
+    /* !!! Maybe change again to the following two lines? ??? */
+    /* border: 1px solid $looks-secondary;
+    box-shadow: 0px 0px 0px 3px $looks-transparent; */
+
+    border: 1px solid #4d97ff;
+    box-shadow: 0px 0px 0px 3px hsla(215, 100%, 65%, 0.2);
 }
 
 .swatch-icon {
@@ -112,4 +136,39 @@
 
 [dir="rtl"] .gradient-swatches-row {
     flex-direction: row-reverse;
+}
+
+
+.picker-row {
+    display: flex;
+    margin: 8px;
+    margin-top: 12px;
+    width: 150px;
+    align-items: center;
+}
+
+.picker-row .picker-color {
+    border: none;
+    border-radius: 0;
+    padding: 0 0.2rem;
+    width: 3rem;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+}
+
+.picker-row .picker-text {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+[dir="ltr"] .picker-row .picker-text {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+[dir="rtl"] .picker-row .picker-text {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }

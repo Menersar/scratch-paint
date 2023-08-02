@@ -38,6 +38,7 @@ import Formats, {isBitmap, isVector} from '../../lib/format';
 import styles from './paint-editor.css';
 
 import bitmapIcon from './icons/bitmap.svg';
+import themeIcon from './icons/theme.svg';
 import zoomInIcon from './icons/zoom-in.svg';
 import zoomOutIcon from './icons/zoom-out.svg';
 import zoomResetIcon from './icons/zoom-reset.svg';
@@ -59,6 +60,7 @@ const PaintEditorComponent = props => (
     <div
         className={styles.editorContainer}
         dir={props.rtl ? 'rtl' : 'ltr'}
+        data-paint-theme={props.theme}
     >
         {props.canvas !== null ? ( // eslint-disable-line no-negated-condition
             <div className={styles.editorContainerTop}>
@@ -72,6 +74,7 @@ const PaintEditorComponent = props => (
                         onUndo={props.onUndo}
                         onUpdateImage={props.onUpdateImage}
                         onUpdateName={props.onUpdateName}
+                        width={props.width}
                     />
                 </div>
                 {/* Second Row */}
@@ -207,10 +210,11 @@ const PaintEditorComponent = props => (
                         image={props.image}
                         imageFormat={props.imageFormat}
                         imageId={props.imageId}
+                        onUpdateImage={props.onUpdateImage}
                         rotationCenterX={props.rotationCenterX}
                         rotationCenterY={props.rotationCenterY}
+                        theme={props.theme}
                         zoomLevelId={props.zoomLevelId}
-                        onUpdateImage={props.onUpdateImage}
                     />
                     <textarea
                         className={styles.textArea}
@@ -224,6 +228,7 @@ const PaintEditorComponent = props => (
                                 <Loupe
                                     colorInfo={props.colorInfo}
                                     pixelRatio={paper.project.view.pixelRatio}
+                                    theme={props.theme}
                                 />
                             </Box>
                         ) : null
@@ -296,6 +301,20 @@ const PaintEditorComponent = props => (
                                 />
                             </Button>
                         </ButtonGroup>
+                        <ButtonGroup>
+                            <Button
+                                className={styles.buttonGroupButton}
+                                onClick={props.onChangeTheme}
+                            >
+                                <img
+                                    // !!! Translate the following line? ???
+                                    alt="Change theme"
+                                    className={styles.buttonGroupButtonIcon}
+                                    draggable={false}
+                                    src={themeIcon}
+                                />
+                            </Button>
+                        </ButtonGroup>
                     </InputGroup>
                 </div>
             </div>
@@ -318,6 +337,7 @@ PaintEditorComponent.propTypes = {
     intl: intlShape,
     isEyeDropping: PropTypes.bool,
     name: PropTypes.string,
+    onChangeTheme: PropTypes.func.isRequired,
     onRedo: PropTypes.func.isRequired,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,
@@ -333,6 +353,8 @@ PaintEditorComponent.propTypes = {
     setCanvas: PropTypes.func.isRequired,
     setTextArea: PropTypes.func.isRequired,
     textArea: PropTypes.instanceOf(Element),
+    theme: PropTypes.string,
+    width: PropTypes.number,
     zoomLevelId: PropTypes.string
 };
 
