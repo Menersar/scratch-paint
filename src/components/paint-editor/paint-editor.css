@@ -55,7 +55,7 @@ $border-radius: 0.25rem;
     display: inline-block;
     border: 1px solid $ui-pane-border;
     border-radius: 0;
-    padding: .35rem;
+    padding: 0.35rem;
 }
 
 [dir="ltr"] .button-group-button {
@@ -142,7 +142,7 @@ $border-radius: 0.25rem;
     /* !!! Effect and reason for remove of 'box-sizing: content-box'? ??? */
     /* box-sizing: content-box; */
     border: 1px solid #e8edf1;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
     position: relative;
     overflow: visible;
 }
@@ -186,8 +186,8 @@ $border-radius: 0.25rem;
     display: flex;
     border-radius: 5px;
     /* !!! Maybe change again to the following line? ??? */
-    /* background-color: $looks-secondary; */
-    background-color: $motion-primary;
+    background-color: $looks-secondary;
+    /* background-color: $motion-primary; */
     padding: calc(2 * $grid-unit);
     line-height: 1.5rem;
     font-size: calc(3 * $grid-unit);
@@ -227,7 +227,7 @@ $border-radius: 0.25rem;
     color: black;
     display: none;
     margin: 0px;
-    opacity: .8;
+    opacity: 0.8;
     outline: none;
     overflow: hidden;
     padding: 0px;
