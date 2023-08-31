@@ -8,11 +8,14 @@
     padding: calc(2 * $grid-unit);
     padding-left: calc(3 * $grid-unit);
     padding-right: calc(3 * $grid-unit);
-    white-space: nowrap;
+    /* Allow font dropdown items to wrap. */
+    /* white-space: nowrap; */
     width: 8.5rem;
     cursor: pointer;
     transition: 0.1s ease;
     align-items: center;
+    /* Improve handling of long font names. */
+    overflow-wrap: anywhere;
 }
 
 .mod-menu-item:hover {
@@ -28,9 +31,12 @@
 .mod-unselect {
     user-select: none;
 }
-
+    
+/* Improve handling of long font names. */
 .displayed-font-name {
     font-size: .8rem;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .font-dropdown {
@@ -43,7 +49,7 @@
     height: 2rem;
 }
 
-.serif {
+/* .serif {
     font-family: 'Serif';
 }
 
@@ -81,4 +87,4 @@
 
 .korean {
     font-family: "Malgun Gothic";
-}
+} */
