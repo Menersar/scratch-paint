@@ -22,7 +22,6 @@ import {setCustomFonts} from '../reducers/custom-fonts';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
-// import {resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
 import {resizeView, resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
 import EyeDropperTool from '../helper/tools/eye-dropper';
 
@@ -30,9 +29,6 @@ import Modes, {BitmapModes, VectorModes} from '../lib/modes';
 import Formats, {isBitmap, isVector} from '../lib/format';
 import bindAll from 'lodash.bindall';
 
-
-// !!!!
-// !!! ???
 window.paper = paper;
 
 /**
@@ -305,8 +301,6 @@ class PaintEditor extends React.Component {
         this.eyeDropper.pickY = -1;
         this.eyeDropper.activate();
 
-
-        // this.intervalId = setInterval(() => {
         const callback = () => {
             this.animationFrameId = requestAnimationFrame(callback);
             const colorInfo = this.eyeDropper.getColorInfo(
@@ -324,16 +318,10 @@ class PaintEditor extends React.Component {
                     colorInfo: colorInfo
                 });
             }
-
-
-        // }, 30);
         };
         this.animationFrameId = requestAnimationFrame(callback);
     }
     stopEyeDroppingLoop () {
-
-
-        // clearInterval(this.intervalId);
         cancelAnimationFrame(this.animationFrameId);
         this.setState({colorInfo: null});
     }
@@ -389,7 +377,6 @@ PaintEditor.propTypes = {
     fontInlineFn: PropTypes.func,
     handleSwitchToBitmap: PropTypes.func.isRequired,
     handleSwitchToVector: PropTypes.func.isRequired,
-    // height: PropTypes.number,
     image: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.instanceOf(HTMLImageElement)
@@ -409,19 +396,11 @@ PaintEditor.propTypes = {
         activate: PropTypes.func.isRequired,
         remove: PropTypes.func.isRequired
     }),
-
-
-    // // !!!!
-    // // !!! 'reduxTheme'? ???
-    // reduxTheme: PropTypes.oneOf(['default', 'light', 'dark']),
-
-
     removeTextEditTarget: PropTypes.func.isRequired,
     rotationCenterX: PropTypes.number,
     rotationCenterY: PropTypes.number,
     rtl: PropTypes.bool,
     setLayout: PropTypes.func.isRequired,
-    // setReduxTheme: PropTypes.func.isRequired,
     setSelectedItems: PropTypes.func.isRequired,
     shouldShowRedo: PropTypes.func.isRequired,
     shouldShowUndo: PropTypes.func.isRequired,
@@ -432,7 +411,6 @@ PaintEditor.propTypes = {
     height: PropTypes.number,
     updateViewBounds: PropTypes.func.isRequired,
     viewBounds: PropTypes.instanceOf(paper.Matrix).isRequired,
-    // width: PropTypes.number,
     zoomLevelId: PropTypes.string
 };
 

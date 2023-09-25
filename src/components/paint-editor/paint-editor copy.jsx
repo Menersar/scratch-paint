@@ -309,7 +309,6 @@ const PaintEditorComponent = props => (
                                 onClick={props.onChangeTheme}
                             >
                                 <img
-                                    // !!! Translate the following line? ???
                                     alt="Change theme"
                                     className={styles.buttonGroupButtonIcon}
                                     draggable={false}

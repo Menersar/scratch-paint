@@ -13,8 +13,6 @@ import {groupSelection, shouldShowGroup, ungroupSelection, shouldShowUngroup} fr
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {changeMode} from '../reducers/modes';
 
-
-// import Formats, {isBitmap} from '../lib/format';
 import Formats, {isBitmap, isVector} from '../lib/format';
 import Modes from '../lib/modes';
 
@@ -52,7 +50,6 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
             ]);
         }
         handleKeyPress (event) {
-            // if (event.target instanceof HTMLInputElement) {
             if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                 // Ignore keyboard shortcuts if a text input field is focused
                 return;
@@ -70,50 +67,27 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                     this.props.setSelectedItems(this.props.format);
                 }
             } else if (event.metaKey || event.ctrlKey) {
-
-
-                // if (event.shiftKey && event.key.toLowerCase() === 'z') {
                 if ((event.shiftKey && lowercaseKey === 'z') || lowercaseKey === 'y') {
                     event.preventDefault();
                     this.props.onRedo();
-
-
-                // } else if (event.key === 'z') {
                 } else if (lowercaseKey === 'z') {
                     event.preventDefault();
                     this.props.onUndo();
-
-
-                // } else if (event.shiftKey && event.key.toLowerCase() === 'g') {
                 } else if (event.shiftKey && lowercaseKey === 'g') {
                     if (shouldShowUngroup()) {
                         ungroupSelection(clearSelectedItems, setSelectedItems, this.props.onUpdateImage);
                     }
                     event.preventDefault();
-
-
-                // } else if (event.key === 'g') {
                 } else if (lowercaseKey === 'g') {
                     if (shouldShowGroup()) {
                         groupSelection(clearSelectedItems, setSelectedItems, this.props.onUpdateImage);
                     }
                     event.preventDefault();
-
-
-                // } else if (event.key === 'c') {
                 } else if (lowercaseKey === 'c') {
-
-
                     this.props.onCopyToClipboard();
-
-
-                // } else if (event.key === 'v') {
                 } else if (lowercaseKey === 'v') {
                     this.changeToASelectMode();
                     this.props.onPasteFromClipboard();
-
-
-                // } else if (event.key === 'x') {
                 } else if (lowercaseKey === 'x') {
                     const selectedItems = getSelectedRootItems();
                     if (selectedItems.length > 0) {
@@ -123,9 +97,6 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                         }
                     }
                     event.preventDefault();
-
-
-                // } else if (event.key === 'a') {
                 } else if (lowercaseKey === 'a') {
                     this.changeToASelectMode();
                     event.preventDefault();
